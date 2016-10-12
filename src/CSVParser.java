@@ -44,10 +44,8 @@ public class CSVParser {
         int bytesRead = 0, i = 0, colCount = 0;
         int rowCount = 0, rowsRead = rowCount;
         positionalMaps[colCount++].add(0);
-        System.out.println("About to read file");
         try {
             while((bytesRead = fc.read(bb))!=-1){
-                System.out.println("bytes read "+bytesRead);
                 for(i=0;i<bytesRead;i++){
                     if(buffer[i]==44){                          // if ',' is encountered
                         positionalMaps[colCount++].add(i+1);
@@ -101,8 +99,67 @@ public class CSVParser {
         }
         return ret;
     }
+
+    public  ArrayList<StringBuilder> fetch(int colNo){
+        if(colNo < 0 || colNo >= totalCol){
+            return null;
+        }
+        FileInputStream fis = null;
+        int rowOffset = colNo==totalCol-1?1:0;
+        ArrayList<StringBuilder> ret = new ArrayList<StringBuilder>();
+        try {
+            fis = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+        FileChannel fc = fis.getChannel();
+        byte[] buffer = new byte[BLOCK_SIZE];
+        ByteBuffer bb = ByteBuffer.wrap(buffer);
+        int bytesRead = 0, i = 0, colCount = 0;
+        int rowCount = 0, rowsRead = rowCount;
+        positionalMaps[colCount++].add(0);
+        try {
+            for(int blocksRead=0;(bytesRead = fc.read(bb))!=-1;blocksRead++){
+                if(ret.size()==rowsRead+1){
+                    StringBuilder sb = ret.get(rowsRead);
+                    int endIndex = positionalMaps[(colNo+1)%totalCol].get(rowsRead+rowOffset);
+                    for(int startIndex=0;startIndex<endIndex-1;startIndex++){
+                        sb.append((char)buffer[startIndex]);
+                    }
+                    rowsRead++;
+                }
+                rowCount=blockMaps[colNo].get(blocksRead);
+                for(;rowsRead<rowCount;rowsRead++){
+                    int startIndex = positionalMaps[colNo].get(rowsRead);
+                    int endIndex = positionalMaps[(colNo+1)%totalCol].get(rowsRead+rowOffset);
+                    StringBuilder sb = new StringBuilder();
+                    for(;startIndex<endIndex-1;startIndex++) {
+                        sb.append((char)buffer[startIndex]);
+                    }
+                    ret.add(sb);
+                }
+                bb.clear();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally{
+            try {
+                fc.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
     public ArrayList<StringBuilder> fetchCol(int colNo){
-            return initFetch(colNo);
+            return positionalMaps==null?initFetch(colNo):fetch(colNo);
     }
     public static void main(String args[]){
         String pathname = "D:\\Languages and Runtime for Big Data\\CSVParser\\extras\\NBA.csv";

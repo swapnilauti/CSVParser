@@ -34,30 +34,36 @@ public class CSVDriver {
     public static void main(String args[]){
         String pathname = "D:\\Languages and Runtime for Big Data\\CSVParser\\extras\\NBA.csv";
         int totalColumns = 18;
-        int colToQuery = 0;
         int opCount = 10;
         boolean fullScan = true;
         File file = new File(pathname);
         CSVParser obj = new CSVParser(file, totalColumns);
-        ArrayList<StringBuilder> sb = obj.fetchCol(colToQuery);
-        KeyValueIterator src = new FileValueIterator(sb);
-        System.out.println("done");
-        Random rand = new Random();
-        ArrayCog root = new ArrayCog(sb.size());
-        System.out.println("loading");
-        root.load(src);
-        Mode mode = new MergeMode();
-        Driver driver = new Driver(mode, root);
-        for(int i = 0; i < opCount; i++) {
-            long k = rand.nextLong()%56;
+        for(int colToQuery=totalColumns-2;colToQuery>0;colToQuery--){
+            System.out.println("reading column no " + colToQuery);
             long start = System.nanoTime();
-            KeyValueIterator iter = driver.scan(k, k + 100);
+            ArrayList<StringBuilder> sb = obj.fetchCol(colToQuery);
             long end = System.nanoTime();
-            if (fullScan) {
-                while (iter.next()) { /* do nothing? */ }
-            }
+            KeyValueIterator src = new FileValueIterator(sb);
+            ArrayCog root = new ArrayCog(sb.size());
+            System.out.println("loading");
+            root.load(src);
             long fullEnd = System.nanoTime();
-            System.out.println("Read ("+i+"): "+(end - start) / 1000+" us (w/ scan: "+(fullEnd - start) / 1000+" us");
+            Mode mode = new MergeMode();
+            Driver driver = new Driver(mode, root);
+            System.out.println("Fetch (" + colToQuery + "): " + (end - start) / 1000 + " us (w/ Convert: " + (fullEnd - start) / 1000 + " us");
+
+//            for (int i = 0; i < opCount; i++) {
+//                long k = rand.nextLong() % 56;
+//                long start = System.nanoTime();
+//                KeyValueIterator iter = driver.scan(k, k + 100);
+//                long end = System.nanoTime();
+//                if (fullScan) {
+//                    while (iter.next()) { /* do nothing? */ }
+//                }
+//                long fullEnd = System.nanoTime();
+//                System.out.println("Read (" + i + "): " + (end - start) / 1000 + " us (w/ scan: " + (fullEnd - start) / 1000 + " us");
+//            }
+
         }
     }
 }
