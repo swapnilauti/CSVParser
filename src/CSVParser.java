@@ -8,7 +8,7 @@ import java.util.Iterator;
  * Created by SwapnilSudam on 10/10/2016.
  */
 public class CSVParser {
-    private final int BLOCK_SIZE = 7157;
+    private final int BLOCK_SIZE = 40000;
     private File file;
     private int totalCol;
     private ArrayList<Integer> positionalMaps[];
@@ -44,15 +44,17 @@ public class CSVParser {
         int bytesRead = 0, i = 0, colCount = 0;
         int rowCount = 0, rowsRead = rowCount;
         positionalMaps[colCount++].add(0);
+        System.out.println("About to read file");
         try {
             while((bytesRead = fc.read(bb))!=-1){
+                System.out.println("bytes read "+bytesRead);
                 for(i=0;i<bytesRead;i++){
                     if(buffer[i]==44){                          // if ',' is encountered
                         positionalMaps[colCount++].add(i+1);
                     }
                     else if(buffer[i]==10){                     // if '\n' is encountered
                         colCount = 0;
-                        positionalMaps[colCount++].add(i+1);  // if '\n' is the last byte of block
+                        positionalMaps[colCount++].add(i+1);
                         rowCount++;
                     }
                 }
@@ -81,9 +83,21 @@ public class CSVParser {
                 for(;j<totalCol;j++) {
                     blockMaps[j].add(rowCount-1);
                 }
+                bb.clear();
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally{
+            try {
+                fc.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return ret;
     }

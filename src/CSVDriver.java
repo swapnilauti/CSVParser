@@ -37,7 +37,8 @@ public class CSVDriver {
         int colToQuery = 0;
         int opCount = 10;
         boolean fullScan = true;
-        CSVParser obj = new CSVParser(new File(pathname),totalColumns);
+        File file = new File(pathname);
+        CSVParser obj = new CSVParser(file, totalColumns);
         ArrayList<StringBuilder> sb = obj.fetchCol(colToQuery);
         KeyValueIterator src = new FileValueIterator(sb);
         System.out.println("done");
