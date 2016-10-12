@@ -8,7 +8,7 @@ import java.util.Iterator;
  * Created by SwapnilSudam on 10/10/2016.
  */
 public class CSVParser {
-    private final int BLOCK_SIZE = 40000;
+    private final int BLOCK_SIZE = 4000;
     private File file;
     private int totalCol;
     private ArrayList<Integer> positionalMaps[];
@@ -67,6 +67,22 @@ public class CSVParser {
                 for(;rowsRead<rowCount;rowsRead++){
                     int startIndex = positionalMaps[colNo].get(rowsRead);
                     int endIndex = positionalMaps[(colNo+1)%totalCol].get(rowsRead+rowOffset);
+                    StringBuilder sb = new StringBuilder();
+                    for(;startIndex<endIndex-1;startIndex++) {
+                        sb.append((char)buffer[startIndex]);
+                    }
+                    ret.add(sb);
+                }
+                if(rowsRead==positionalMaps[colNo].size()-1){
+                    int startIndex = positionalMaps[colNo].get(rowsRead);
+                    int endIndex = 0;
+                    if(rowsRead==positionalMaps[(colNo+1)%totalCol].size()-1) {
+                        endIndex = positionalMaps[(colNo+1)%totalCol].get(rowsRead);
+                        rowsRead++;
+                    }
+                    else{
+                        endIndex = BLOCK_SIZE-1;
+                    }
                     StringBuilder sb = new StringBuilder();
                     for(;startIndex<endIndex-1;startIndex++) {
                         sb.append((char)buffer[startIndex]);
