@@ -34,7 +34,12 @@ public class CSVReader {
         catch (IOException e) {
             e.printStackTrace();
         }
-        filePos+=byteRead;
+        if(byteRead>0) {
+            filePos += byteRead;
+        }
+        else{
+            filePos=0;
+        }
         return byteRead;
     }
 
