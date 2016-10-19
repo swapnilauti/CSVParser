@@ -36,7 +36,6 @@ public class CSVParser {
      * This method fetches the column by creating positional map if it
      * doesn't exist or by just fetching the column from positional map
      * if it exists
-     *
      * @param column int index of the column of the CSV table
      * @return arrayList of column value
      */
