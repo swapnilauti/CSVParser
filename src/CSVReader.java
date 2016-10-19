@@ -43,8 +43,7 @@ public class CSVReader {
         return byteRead;
     }
 
-    /**int byteRead
-     * This method is used to read the CSV File in a single block and
+    /** This method is used to read the CSV File in a single block and
      * return the whole block. Should be used with small files.
      * @return int returns the block read as byte array
      */

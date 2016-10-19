@@ -7,29 +7,107 @@ public class CSVParser {
     private static Logger log = Logger.getLogger("CSVReader");
     private CSVReader fileReader;
     private int blockSize;
+    private boolean isPositionalMapFormed;
+    private ArrayList<ArrayList<Long>> positionalMap;
+    private int columnSize;
 
+    /**Constructor
+     * @param blockSize blocksize for the file read
+     * @param fileName filename with path
+     */
     public CSVParser(String fileName, int blockSize) {
         this.fileName = fileName;
-        positionalMap = new ArrayList<ArrayList<Integer>>();
+        positionalMap = new ArrayList<>();
         fileReader = new CSVReader(fileName);
         isPositionalMapFormed = false;
         this.blockSize = blockSize;
     }
 
-    private ArrayList<ArrayList<Integer>> positionalMap;
+    /**This method returns the total columns in the CSV File
+     * @return int colunmSize value
+     */
+    public int getColumnSize() {
+        return columnSize;
+    }
 
-    private boolean isPositionalMapFormed;
 
-    /**
-     * This method fetches the column by creating positional map if it
-     * doesn't exist or by just fetching the column from positional map
-     * if it exists
+
+    /**This method fetches the column by creating positional map if it
+     * doesn't exist. if the positional map exists then it fetches the column
+     * from positional map.
      *
      * @param column int index of the column of the CSV table
      * @return arrayList of column value
      */
     public ArrayList<Long> fetchColumn(int column) {
+        if (!isPositionalMapFormed) {
+            return (createPositionalMapFetchCol(column));
+        }
+        ArrayList<Long> returnList = new ArrayList<>();
+        int bytesRead=0;
+        long bytesTillLastBlock=0;
+        byte[] block=new byte[blockSize];
+        for(int i=0;i<positionalMap.size();++i){
+            StringBuilder val = new StringBuilder();
+            long startPos=0;
+            long endPos=0;
+            if(column==0){
+                startPos=(i==0?0:positionalMap.get(i - 1).get(getColumnSize() - 1) + 2);
+                endPos = positionalMap.get(i).get(column);
+            }
+            else {
+                startPos = positionalMap.get(i).get(column - 1) + 2;
+                endPos = positionalMap.get(i).get(column);
+            }
+            if(startPos>=bytesTillLastBlock+(long)bytesRead){
+                bytesTillLastBlock+=bytesRead;
+                bytesRead=fileReader.readCSVBlock(block);
+            }
+            for(int j=(int)(startPos-bytesTillLastBlock);j<=(int)(endPos-bytesTillLastBlock);++j){
+                val.append((char)block[j]);
+            }
+            returnList.add(Long.parseLong(val.toString()));
+        }
+        return returnList;
+    }
 
+    /**
+     * This is private method is used for creating full positional map and simultaneously
+     * load the desired column as well. It is being called internally from fetchColumn.
+     *
+     * @param column int index of the column of the CSV table
+     * @return arrayList of column value
+     */
+    private ArrayList<Long> createPositionalMapFetchCol(int column) {
+        int colCount=0,bytesRead;
+        long position=0;
+        byte[] block=new byte[blockSize];
+        ArrayList<Long> returnList = new ArrayList<>();
+        while((bytesRead=fileReader.readCSVBlock(block)) > 0){
+            ArrayList<Long> row = new ArrayList<>();
+            StringBuilder val = new StringBuilder();
+            for(int i=0;i<bytesRead;++i){
+                if(block[i]==44){
+                    row.add(position-1);
+                    colCount++;
+                }
+                else if(block[i]==10){
+                    row.add(position-1);
+                    returnList.add(Long.parseLong(val.toString()));
+                    colCount=0;
+                    positionalMap.add(row);
+                    row = new ArrayList<>();
+                    val = new StringBuilder();
+                }
+                else if(colCount==column){
+                    val.append((char)block[i]);
+                }
+                position++;
+            }
+        }
+        columnSize=positionalMap.get(0).size();
+        isPositionalMapFormed=true;
+        return returnList;
     }
 
     /**
@@ -51,40 +129,6 @@ public class CSVParser {
      */
     public ArrayList<Long> fetchColumnByRowId(int column, int rowIdMin, int rowIdMax) {
 
-    }
-
-    /**
-     * This is private method being worked upon (Sarang)
-     *
-     * @param column int index of the column of the CSV table
-     * @return arrayList of
-     */
-    private ArrayList<StringBuilder> createPositionalMapFetchCol(int column) {
-        int rowCount = 0, colCount = 0, bytesRead = 0;
-        byte[] block = new byte[blockSize];
-        ArrayList<StringBuilder> returnList = new ArrayList<StringBuilder>();
-
-        while ((bytesRead = fileReader.readCSVBlock(block)) >= 0) {
-            ArrayList<Integer> row = new ArrayList<Integer>();
-            StringBuilder val = new StringBuilder();
-            for (int i = 0; i < bytesRead; ++i) {
-                if (block[i] == 44) {
-                    row.add(i - 1);
-                    colCount++;
-                } else if (colCount == column) {
-                    val.append((char) block[i]);
-                } else if (block[i] == 10) {
-                    row.add(i - 1);
-                    returnList.add(val);
-                    colCount = 0;
-                    rowCount++;
-                    positionalMap.add(row);
-                    row = new ArrayList<Integer>();
-                    val = new StringBuilder();
-                }
-            }
-        }
-        return returnList;
     }
 
 }
