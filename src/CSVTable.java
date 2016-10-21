@@ -31,7 +31,7 @@ class FileValueIterator extends KeyValueIterator{
 }
 
 public class CSVTable {
-    private Cog cogs[];
+    private Driver cogDrivers[];
     private boolean hasCog[];
     private final int blockSize = 8*1024;
     private CSVParser csvParser;
@@ -41,15 +41,15 @@ public class CSVTable {
     }
 
     private void createCog(int colNo){
-        if(cogs==null){
+        if(cogDrivers==null){
             ArrayList<Long> columnValues = csvParser.fetchColumn(colNo);
             int totalCols = csvParser.getColumnSize();
-            cogs = new Cog[totalCols];
+            cogDrivers = new Driver[totalCols];
             hasCog = new boolean[totalCols];
             FileValueIterator fvi = new FileValueIterator(columnValues);
             ArrayCog root = new ArrayCog(columnValues.size());
             root.load(fvi);
-            cogs[colNo] = root;
+            cogDrivers[colNo] = new Driver(new MergeMode(),root);
             hasCog[colNo] = true;
         }
         else if(!hasCog[colNo]){
@@ -57,17 +57,15 @@ public class CSVTable {
             FileValueIterator fvi = new FileValueIterator(columnValues);
             ArrayCog root = new ArrayCog(columnValues.size());
             root.load(fvi);
-            cogs[colNo] = root;
+            cogDrivers[colNo] = new Driver(new MergeMode(),root);
             hasCog[colNo] = true;
         }
     }
 
     public KeyValueIterator rangeScan(int colNo, long low, long high){
-        if(cogs==null || !hasCog[colNo])
+        if(cogDrivers==null || !hasCog[colNo])
             createCog(colNo);
-        Mode mode = new MergeMode();
-        Cog root = cogs[colNo];
-        Driver driver = new Driver(mode, root);
+        Driver driver = cogDrivers[colNo];
         KeyValueIterator iter = driver.scan(low,high);
         return iter;
     }
@@ -75,12 +73,12 @@ public class CSVTable {
     public long lookUp(int col, int row){
         return csvParser.fetchValue(col,row);
     }
-    public ArrayList<Long> lookUp(int col, int row1, int row2){
-        if(row1>row2){
-            int temp = row1;
-            row1 = row2;
-            row2 = temp;
+    public ArrayList<Long> lookUp(int col, int rowl, int rowh){
+        if(rowl>rowh){
+            int temp = rowl;
+            rowl = rowh;
+            rowh = temp;
         }
-        return csvParser.fetchColumnByRowId(col, row1, row2);
+        return csvParser.fetchColumnByRowId(col, rowl, rowh);
     }
 }
