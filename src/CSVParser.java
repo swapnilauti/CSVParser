@@ -31,7 +31,6 @@ public class CSVParser {
     }
 
 
-
     /**This method fetches the column by creating positional map if it
      * doesn't exist. if the positional map exists then it fetches the column
      * from positional map.
@@ -118,7 +117,7 @@ public class CSVParser {
      * @return arrayList of column value
      */
     public long fetchValue(int column, int rowId) {
-
+        return 0;
     }
     /**
      * This method fetches the column by creating positional map if it
@@ -128,7 +127,7 @@ public class CSVParser {
      * @return arrayList of column value in between the rowIdMin and rowIdMax
      */
     public ArrayList<Long> fetchColumnByRowId(int column, int rowIdMin, int rowIdMax) {
-
+        return null;
     }
 
 }
