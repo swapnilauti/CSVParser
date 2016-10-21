@@ -68,6 +68,7 @@ public class CSVParser {
             }
             returnList.add(Long.parseLong(val.toString()));
         }
+        fileReader.resetFilePos();
         return returnList;
     }
 
@@ -118,7 +119,7 @@ public class CSVParser {
      * @return arrayList of column value
      */
     public long fetchValue(int column, int rowId) {
-
+        return 0;
     }
     /**
      * This method fetches the column by creating positional map if it
@@ -128,7 +129,7 @@ public class CSVParser {
      * @return arrayList of column value in between the rowIdMin and rowIdMax
      */
     public ArrayList<Long> fetchColumnByRowId(int column, int rowIdMin, int rowIdMax) {
-
+        return null;
     }
 
 }

@@ -33,7 +33,7 @@ class FileValueIterator extends KeyValueIterator{
 public class CSVTable {
     private Driver cogDrivers[];
     private boolean hasCog[];
-    private final int blockSize = 8*1024;
+    private final int blockSize = 24*1024;
     private CSVParser csvParser;
 
     public CSVTable(String filePath){
