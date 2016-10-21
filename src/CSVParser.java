@@ -67,6 +67,7 @@ public class CSVParser {
             }
             returnList.add(Long.parseLong(val.toString()));
         }
+        fileReader.resetFilePos();
         return returnList;
     }
 

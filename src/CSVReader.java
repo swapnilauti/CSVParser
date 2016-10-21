@@ -58,4 +58,8 @@ public class CSVReader {
         return block;
     }
 
+    public void resetFilePos(){
+        filePos=0;
+    }
+
 }
