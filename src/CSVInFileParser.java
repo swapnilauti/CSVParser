@@ -86,12 +86,13 @@ public class CSVInFileParser implements CSVParser{
         while((bytesRead=fileReader.readCSVBlock(block)) > 0){
             ArrayList<Long> row = new ArrayList<>();
             StringBuilder val = new StringBuilder();
+            byte newLine = (byte)10,comma = (byte)44;
             for(int i=0;i<bytesRead;++i){
-                if(block[i]==44){
+                if(block[i]==comma){
                     row.add(position-1);
                     colCount++;
                 }
-                else if(block[i]==10){
+                else if(block[i]==newLine){
                     row.add(position-1);
                     returnList.add(Long.parseLong(val.toString()));
                     colCount=0;

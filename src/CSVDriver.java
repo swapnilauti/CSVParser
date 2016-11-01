@@ -36,7 +36,7 @@ public class CSVDriver {
             cellA1 = row1.createCell(xcol++);
             cellA1.setCellValue(0);
 
-            /*CSVTable sportyDS = new CSVTable(pathname, blockSize);
+            CSVTable sportyDS = new CSVTable(pathname, blockSize);
 
             for (int colToQuery = totalColumns - 1; colToQuery >= 0; colToQuery--) {
                 xcol = 0;
@@ -48,13 +48,13 @@ public class CSVDriver {
                 sportyDS.rangeScan(colToQuery, k, k + 100, time);
                 cellA1 = row1.createCell(xcol++);
                 cellA1.setCellValue(time[0]);
-            }*/
+            }
 
-            long wholeParseStart = System.nanoTime();
+            /*long wholeParseStart = System.nanoTime();
             CSVTable initLoad = new CSVTable(pathname);
             long wholeParseEnd = System.nanoTime();
             cellA1 = row1.createCell(xcol++);
-            cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);
+            cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);*/
 
 
             workbook.write(fileOut);

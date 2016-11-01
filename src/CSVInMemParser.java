@@ -87,12 +87,13 @@ public class CSVInMemParser implements CSVParser {
         ArrayList<Long> returnList = new ArrayList<>();
         ArrayList<Long> row = new ArrayList<>();
         StringBuilder val = new StringBuilder();
+        byte newLine = (byte)10,comma = (byte)44;
         for(int i=0;i<inMemCompleteFile.length;++i){
-            if(inMemCompleteFile[i]==44){
+            if(inMemCompleteFile[i]==comma){
                 row.add(position-1);
                 colCount++;
             }
-            else if(inMemCompleteFile[i]==10){
+            else if(inMemCompleteFile[i]==newLine){
                 row.add(position-1);
                 returnList.add(Long.parseLong(val.toString()));
                 colCount=0;

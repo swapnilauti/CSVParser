@@ -36,7 +36,7 @@ public class CSVTable {
     private CSVParser csvParser;
 
     public CSVTable(String filePath, int blockSize){                            // Constructor for InMem or InFile parser
-        csvParser = new CSVInMemParser(filePath);
+        csvParser = new CSVInFileParser(filePath,blockSize);
         System.out.println(csvParser.getClass().toString());
     }
 
