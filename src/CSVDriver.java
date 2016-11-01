@@ -9,10 +9,10 @@ import org.apache.poi.hssf.usermodel.*;
  */
 public class CSVDriver {
     public static void main(String args[]){
-        String pathname = "D:\\Languages and Runtime for Big Data\\CSVParser\\extras\\NBA.csv";
+        String pathname = "D:\\Languages and Runtime for Big Data\\CSVParser\\extras\\eggs15mb.csv";
         String excelfilepath = "D:\\Languages and Runtime for Big Data\\CSVParser\\extras\\op.xls";
         FileOutputStream fileOut = null;
-        int blockSize = 24*1024;
+        int blockSize = 16*1024*1024;
         try {
             fileOut = new FileOutputStream(excelfilepath);
             int totalColumns = 18;
