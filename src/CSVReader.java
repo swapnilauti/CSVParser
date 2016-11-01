@@ -20,8 +20,9 @@ public class CSVReader {
      */
     public int readCSVBlock(byte[] block){
         int byteRead=0;
+        RandomAccessFile file=null;
         try {
-            RandomAccessFile file=new RandomAccessFile(fileName,"r");
+            file=new RandomAccessFile(fileName,"r");
             file.seek(filePos);
             byteRead=file.read(block);
             while(byteRead>0 && block[byteRead-1]!=10){
@@ -33,6 +34,12 @@ public class CSVReader {
         }
         catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                file.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         if(byteRead>0) {
             filePos += byteRead;
