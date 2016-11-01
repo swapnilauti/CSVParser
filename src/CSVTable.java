@@ -33,14 +33,14 @@ class FileValueIterator extends KeyValueIterator{
 public class CSVTable {
     private Driver cogDrivers[];
     private boolean hasCog[];
-    private int blockSize = 24*1024;
     private CSVParser csvParser;
 
-    public CSVTable(String filePath, int blockSize){
-        this.blockSize = blockSize;
+    public CSVTable(String filePath, int blockSize){                            // Constructor for InMem or InFile parser
         csvParser = new CSVInMemParser(filePath);
+        System.out.println(csvParser.getClass().toString());
     }
-    public CSVTable(String filePath){
+
+    public CSVTable(String filePath){                                           //Constructor for Naive Parser
         CSVReader csvReader = new CSVReader(filePath);
         byte block[] = csvReader.readCSVAllLines();
         int totalCol = calculateTotalCol(block);
@@ -50,15 +50,16 @@ public class CSVTable {
         }
         ArrayList<Byte> cell = new ArrayList<>();
         int colNo =0;
+        byte newLine = (byte)10,comma = (byte)44;
         for(int i=0;i<block.length;i++){
-            if(block[i]==10) {            //'\n'
+            if(block[i]==newLine) {            //'\n'
                 columns[colNo].add(byteArrayToLong(cell));
                 colNo=0;
-                cell = new ArrayList<Byte>();
-            } else if(block[i]==44){
+                cell.clear();
+                } else if(block[i]==comma){
                 columns[colNo++].add(byteArrayToLong(cell));
-                cell = new ArrayList<Byte>();
-            } else{
+                cell.clear();
+                } else{
                 cell.add(block[i]);
             }
         }
@@ -106,7 +107,7 @@ public class CSVTable {
         return iter;
     }
 
-    /*public long lookUp(int col, int row){
+    public long lookUp(int col, int row){
         return csvParser.fetchValue(col,row);
     }
     public ArrayList<Long> lookUp(int col, int rowl, int rowh){
@@ -117,5 +118,4 @@ public class CSVTable {
         }
         return csvParser.fetchColumnByRowId(col, rowl, rowh);
     }
-    */
 }
