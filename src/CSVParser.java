@@ -31,7 +31,6 @@ public class CSVParser {
     }
 
 
-
     /**This method fetches the column by creating positional map if it
      * doesn't exist. if the positional map exists then it fetches the column
      * from positional map.
