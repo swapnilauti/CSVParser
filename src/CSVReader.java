@@ -61,9 +61,11 @@ public class CSVReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        long end = System.currentTimeMillis();
         return block;
     }
+
+    /**This method is used to reset the filepos to 0
+     */
 
     public void resetFilePos(){
         filePos=0;
