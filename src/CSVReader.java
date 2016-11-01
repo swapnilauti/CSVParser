@@ -58,6 +58,9 @@ public class CSVReader {
         return block;
     }
 
+    /**This method is used to reset the filepos to 0
+     */
+
     public void resetFilePos(){
         filePos=0;
     }
