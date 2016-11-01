@@ -61,7 +61,6 @@ public class CSVReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        long end = System.currentTimeMillis();
         return block;
     }
 
