@@ -38,7 +38,7 @@ public class CSVTable {
 
     public CSVTable(String filePath, int blockSize){
         this.blockSize = blockSize;
-        csvParser = new CSVParser(filePath,blockSize);
+        csvParser = new CSVInMemParser(filePath);
     }
     public CSVTable(String filePath){
         CSVReader csvReader = new CSVReader(filePath);
@@ -106,7 +106,7 @@ public class CSVTable {
         return iter;
     }
 
-    public long lookUp(int col, int row){
+    /*public long lookUp(int col, int row){
         return csvParser.fetchValue(col,row);
     }
     public ArrayList<Long> lookUp(int col, int rowl, int rowh){
@@ -117,4 +117,5 @@ public class CSVTable {
         }
         return csvParser.fetchColumnByRowId(col, rowl, rowh);
     }
+    */
 }

@@ -9,15 +9,13 @@ import org.apache.poi.hssf.usermodel.*;
  */
 public class CSVDriver {
     public static void main(String args[]){
-        String pathname = "D:\\Languages and Runtime for Big Data\\CSVParser\\extras\\eggs15mb.csv";
-        String excelfilepath = "D:\\Languages and Runtime for Big Data\\CSVParser\\extras\\op.xls";
+        String pathname = args[0];
+        String excelfilepath = args[1];
         FileOutputStream fileOut = null;
         int blockSize = 16*1024*1024;
         try {
             fileOut = new FileOutputStream(excelfilepath);
             int totalColumns = 18;
-            int opCount = 10;
-            boolean fullScan = true;
             Random rand = new Random();
             // Code to create excel file
 
@@ -42,42 +40,26 @@ public class CSVDriver {
             long wholeParseStart = System.nanoTime();
             CSVTable initLoad = new CSVTable(pathname);
             long wholeParseEnd = System.nanoTime();
-            long initTime = 0, sportyTime = 0;
             cellA1 = row1.createCell(xcol++);
             cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);
 
-            long start = 0, end = 0;
-            int i = 0;
 
             for (int colToQuery = totalColumns - 1; colToQuery >= 0; colToQuery--) {
                 xcol = 0;
                 row1 = worksheet.createRow(xrow++);
                 cellA1 = row1.createCell(xcol++);
                 cellA1.setCellValue("Col " + (colToQuery + 1));
-                //for (int i = 0; i < opCount; i++) {
                 long k = rand.nextLong() % 56;
                 long time[] = new long[1];
                 sportyDS.rangeScan(colToQuery, k, k + 100, time);
-
                 cellA1 = row1.createCell(xcol++);
                 cellA1.setCellValue(time[0]);
-
-                /*
-                start = System.nanoTime();
-                initLoad.rangeScan(colToQuery, k, k + 100);
-                end = System.nanoTime();
-
-                cellA1 = row1.createCell(xcol++);
-                cellA1.setCellValue((end - start) / 1000);
-                */
-
-                    //}
             }
             workbook.write(fileOut);
             fileOut.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
+        }  finally {
             try {
                 fileOut.close();
             } catch (IOException e) {
