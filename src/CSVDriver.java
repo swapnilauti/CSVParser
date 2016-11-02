@@ -12,7 +12,7 @@ public class CSVDriver {
         String pathname = args[0];
         String excelfilepath = args[1];
         FileOutputStream fileOut = null;
-        int blockSize = 16*1024*1024;
+        int blockSize = 512*1024;
         try {
             fileOut = new FileOutputStream(excelfilepath);
             int totalColumns = 18;
@@ -38,8 +38,11 @@ public class CSVDriver {
 
             CSVTable sportyDS = new CSVTable(pathname, blockSize);
 
-            for (int colToQuery = totalColumns - 1; colToQuery >= 0; colToQuery--) {
+            for (int colToQuery = 0; colToQuery <totalColumns; colToQuery++) {
                 xcol = 0;
+                System.out.println("GC initiated");
+                System.gc();
+                System.out.println("GC completed");
                 row1 = worksheet.createRow(xrow++);
                 cellA1 = row1.createCell(xcol++);
                 cellA1.setCellValue("Col " + (colToQuery + 1));
@@ -54,8 +57,8 @@ public class CSVDriver {
             CSVTable initLoad = new CSVTable(pathname);
             long wholeParseEnd = System.nanoTime();
             cellA1 = row1.createCell(xcol++);
-            cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);*/
-
+            cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);
+*/
 
             workbook.write(fileOut);
             fileOut.flush();

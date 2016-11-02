@@ -43,8 +43,8 @@ public class CSVInMemParser implements CSVParser {
             return (createPositionalMapFetchCol(column));
         }
         ArrayList<Long> returnList = new ArrayList<>();
+        ArrayList<Byte> cell = new ArrayList<>();
         for(int i=0;i<positionalMap.size();++i){
-            StringBuilder val = new StringBuilder();
             long startPos=0;
             long endPos=0;
             if(column==0){
@@ -56,9 +56,10 @@ public class CSVInMemParser implements CSVParser {
                 endPos = positionalMap.get(i).get(column);
             }
             for(long j=startPos;j<=endPos;++j){
-                val.append((char)inMemCompleteFile[(int)j]);
+                cell.add(inMemCompleteFile[(int)j]);
             }
-            returnList.add(Long.parseLong(val.toString()));
+            returnList.add(CSVUtil.byteArrayToLong(cell));
+            cell.clear();
         }
         fileReader.resetFilePos();
         return returnList;
@@ -86,7 +87,7 @@ public class CSVInMemParser implements CSVParser {
         long position=0;
         ArrayList<Long> returnList = new ArrayList<>();
         ArrayList<Long> row = new ArrayList<>();
-        StringBuilder val = new StringBuilder();
+        ArrayList<Byte> cell = new ArrayList<>();
         byte newLine = (byte)10,comma = (byte)44;
         for(int i=0;i<inMemCompleteFile.length;++i){
             if(inMemCompleteFile[i]==comma){
@@ -95,14 +96,14 @@ public class CSVInMemParser implements CSVParser {
             }
             else if(inMemCompleteFile[i]==newLine){
                 row.add(position-1);
-                returnList.add(Long.parseLong(val.toString()));
+                returnList.add(CSVUtil.byteArrayToLong(cell));
                 colCount=0;
                 positionalMap.add(row);
                 row = new ArrayList<>();
-                val = new StringBuilder();
+                cell.clear();
             }
             else if(colCount==column){
-                val.append((char)inMemCompleteFile[i]);
+                cell.add(inMemCompleteFile[i]);
             }
             position++;
         }
