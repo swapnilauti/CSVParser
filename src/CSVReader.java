@@ -64,11 +64,33 @@ public class CSVReader {
         return block;
     }
 
+    /**This method is used to lookup column value based on rowId
+     * @return byte[] returns the block read as byte array
+     */
+    public byte[] readValue(long startPos, long endPos){
+        byte[] block=new byte[(int)(endPos-startPos+1)];
+        try {
+            RandomAccessFile file=new RandomAccessFile(fileName,"r");
+            file.seek(startPos);
+            file.read(block);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return block;
+    }
+
     /**This method is used to reset the filepos to 0
      */
 
     public void resetFilePos(){
         filePos=0;
+    }
+
+    /**This method is used to reset the filepos to desired position
+     */
+    public void setFilePos(long pos){
+        filePos=pos;
     }
 
 }

@@ -53,12 +53,11 @@ public class CSVDriver {
                 cellA1.setCellValue(time[0]);
             }
 
-            /*long wholeParseStart = System.nanoTime();
+            long wholeParseStart = System.nanoTime();
             CSVTable initLoad = new CSVTable(pathname);
             long wholeParseEnd = System.nanoTime();
             cellA1 = row1.createCell(xcol++);
             cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);
-*/
 
             workbook.write(fileOut);
             fileOut.flush();
