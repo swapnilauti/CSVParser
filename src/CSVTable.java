@@ -37,7 +37,7 @@ public class CSVTable {
     private CSVParser csvParser;
 
     public CSVTable(String filePath, int blockSize){                            // Constructor for InMem or InFile parser
-        csvParser = new CSVInMemParser(filePath);
+        csvParser = new CSVInFileParser(filePath,blockSize);
         System.out.println("Parser = "+csvParser.getClass().toString()+" block size(in MB) = "+(blockSize/1024/1024));
     }
 
@@ -81,7 +81,7 @@ public class CSVTable {
         time[0]=System.nanoTime();
         ArrayList<Long> columnValues = csvParser.fetchColumn(colNo);
         time[0]=(System.nanoTime()-time[0])/1000000;
-        if(cogDrivers==null){
+       /* if(cogDrivers==null){
             int totalCols = csvParser.getColumnSize();
             cogDrivers = new Driver[totalCols];
             hasCog = new boolean[totalCols];
@@ -90,15 +90,16 @@ public class CSVTable {
         ArrayCog root = new ArrayCog(columnValues.size());
         root.load(fvi);
         cogDrivers[colNo] = new Driver(new MergeMode(),root);
-        hasCog[colNo] = true;
+        hasCog[colNo] = true;*/
     }
 
     public KeyValueIterator rangeScan(int colNo, long low, long high, long time[]){
         if(cogDrivers==null || !hasCog[colNo])
             createCog(colNo,time);
-        Driver driver = cogDrivers[colNo];
+        /*Driver driver = cogDrivers[colNo];
         KeyValueIterator iter = driver.scan(low,high);
-        return iter;
+        return iter;*/
+        return null;
     }
 
     public long lookUp(int col, int row){
