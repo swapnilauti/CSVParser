@@ -68,31 +68,32 @@ public class CSVInFileParser implements CSVParser{
         long position=0;
         byte[] block=new byte[blockSize];
         ArrayList<Long> returnList = new ArrayList<>();
+        ArrayList<Byte> cell = new ArrayList<>();
         while((bytesRead=fileReader.readCSVBlock(block)) > 0){
             ArrayList<Long> row = new ArrayList<>();
-            StringBuilder val = new StringBuilder();
+            byte newLine = (byte)10,comma = (byte)44;
             for(int i=0;i<bytesRead;++i){
-                if(block[i]==44){
+                if(block[i]==comma){
                     row.add(position-1);
                     colCount++;
                 }
-                else if(block[i]==10){
+                else if(block[i]==newLine){
                     row.add(position-1);
-                    returnList.add(Long.parseLong(val.toString()));
+                    returnList.add(CSVUtil.byteArrayToLong(cell));
                     colCount=0;
                     positionalMap.add(row);
                     row = new ArrayList<>();
-                    val = new StringBuilder();
+                    cell.clear();
                 }
                 else if(colCount==column){
-                    val.append((char)block[i]);
+                    cell.add(block[i]);
                 }
                 position++;
             }
         }
         columnSize=positionalMap.get(0).size();
-        positionalMapStatus=PositionalMapStatus.COMPLETE;
         fileReader.resetFilePos();
+        positionalMapStatus=PositionalMapStatus.COMPLETE;
         return returnList;
     }
 
@@ -108,8 +109,8 @@ public class CSVInFileParser implements CSVParser{
         int bytesRead=0;
         long bytesTillLastBlock=0;
         byte[] block=new byte[blockSize];
+        ArrayList<Byte> cell = new ArrayList<>();
         for(int i=0;i<positionalMap.size();++i){
-            StringBuilder val = new StringBuilder();
             long startPos=0;
             long endPos=0;
             if(column==0){
@@ -125,9 +126,10 @@ public class CSVInFileParser implements CSVParser{
                 bytesRead=fileReader.readCSVBlock(block);
             }
             for(int j=(int)(startPos-bytesTillLastBlock);j<=(int)(endPos-bytesTillLastBlock);++j){
-                val.append((char)block[j]);
+                cell.add(block[j]);
             }
-            returnList.add(Long.parseLong(val.toString()));
+            returnList.add(CSVUtil.byteArrayToLong(cell));
+            cell.clear();
         }
         fileReader.resetFilePos();
         return returnList;
