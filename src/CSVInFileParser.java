@@ -26,6 +26,7 @@ public class CSVInFileParser implements CSVParser{
         fileReader = new CSVReader(fileName);
         this.blockSize = blockSize;
         this.lastRowPositionalMap=-1;
+        positionalMapStatus=PositionalMapStatus.NONE;
     }
 
     /**This method returns the total columns in the CSV File
@@ -159,7 +160,7 @@ public class CSVInFileParser implements CSVParser{
 
     /**
      * This method fetches the column by creating positional map if it
-     * doesn't exist or by just fetching the column between the given rowids
+     * doesn't exist or by just fetching then column between the given rowids
      *
      * @param column int index of the column of the CSV table
      * @return arrayList of column value in between the rowIdMin and rowIdMax
@@ -221,7 +222,7 @@ public class CSVInFileParser implements CSVParser{
                 break;
             }
         }
-        if(bytesRead==-1){
+        if(0 >= fileReader.readCSVBlock(block)){
             positionalMapStatus=PositionalMapStatus.COMPLETE;
         }
         columnSize=positionalMap.get(0).size();

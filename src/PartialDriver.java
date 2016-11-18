@@ -1,11 +1,17 @@
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
-import org.apache.poi.hssf.usermodel.*;
 
-
-public class CSVDriver {
+/**
+ * Created by saran on 11/17/2016.
+ */
+public class PartialDriver {
     public static void main(String args[]){
         File sourceDir = new File(args[0]);
         String destPath = args[1];
