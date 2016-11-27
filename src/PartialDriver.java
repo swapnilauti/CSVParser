@@ -67,7 +67,7 @@ public class PartialDriver {
                 cellA1 = row1.createCell(xcol++);
                 cellA1.setCellValue(0);
 
-                CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize);
+                CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize,0);
                 long time1=System.nanoTime(),time2;
                 for (int row = rowInterval; row <=totalRows; row=row+rowInterval) {
                     sportyDS.lookUp(5,row);
