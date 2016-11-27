@@ -12,4 +12,12 @@ public class CSVUtil {
         }
         return toRet;
     }
+    public static long byteArrayToLong(byte[] b){
+        long toRet=0l;
+        for(int i=0;i<b.length;i++){
+            toRet*=10;
+            toRet+=(long)b[i];
+        }
+        return toRet;
+    }
 }

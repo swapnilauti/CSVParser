@@ -189,8 +189,7 @@ public class CSVInFileParser implements CSVParser{
             endPos = positionalMap.get(rowId).get(column);
         }
         byte[] b=fileReader.readValue(startPos,endPos);
-        String str = new String(b, StandardCharsets.UTF_8);
-        return (Long.parseLong(str));
+        return (CSVUtil.byteArrayToLong(b));
     }
 
     private long createPartialMapAndFetch(int rowId, int column){
@@ -198,7 +197,7 @@ public class CSVInFileParser implements CSVParser{
         long position=0;
         boolean valFound=false;
         byte[] block=new byte[blockSize];
-        StringBuilder val = new StringBuilder();
+        ArrayList<Byte> cell = new ArrayList<>();
         while((bytesRead=fileReader.readCSVBlock(block)) > 0){
             ArrayList<Long> row = new ArrayList<>();
             for(int i=0;i<bytesRead;++i){
@@ -214,7 +213,7 @@ public class CSVInFileParser implements CSVParser{
                     rowCount++;
                 }
                 else if(rowCount==rowId && colCount==column){
-                    val.append((char)block[i]);
+                    cell.add(block[i]);
                     valFound=true;
                 }
                 position++;
@@ -229,7 +228,7 @@ public class CSVInFileParser implements CSVParser{
         }
         columnSize=positionalMap.get(0).size();
         fileReader.resetFilePos();
-        return (Long.parseLong(val.toString()));
+        return (CSVUtil.byteArrayToLong(cell));
     }
 
 }
