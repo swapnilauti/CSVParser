@@ -64,11 +64,11 @@ public class Driver1 {
                 cellA1 = row1.createCell(xcol++);
                 cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);
                 */
-                        fileOut.flush();
                         Thread.sleep(3000);
                     }
                 }
                 workbook.write(fileOut);
+                fileOut.flush();
             }
 
         } catch (Exception e) {
