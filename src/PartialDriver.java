@@ -12,6 +12,28 @@ import java.util.Random;
  * Created by saran on 11/17/2016.
  */
 public class PartialDriver {
+    public static void printStats(){
+        int mb = 1024*1024;
+
+        //Getting the runtime reference from system
+        Runtime runtime = Runtime.getRuntime();
+
+        System.out.println("##### Heap utilization statistics [MB] #####");
+
+        //Print used memory
+        System.out.println("Used Memory:"
+                + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+
+        //Print free memory
+        System.out.println("Free Memory:"
+                + runtime.freeMemory() / mb);
+
+        //Print total available memory
+        System.out.println("Total Memory:" + runtime.totalMemory() / mb);
+
+        //Print Maximum available memory
+        System.out.println("Max Memory:" + runtime.maxMemory() / mb);
+    }
     public static void main(String args[]){
         File sourceDir = new File(args[0]);
         String destPath = args[1];
@@ -21,7 +43,9 @@ public class PartialDriver {
         try {
             for(File file:inputFiles) {
                 fileOut = new FileOutputStream(destPath+file.getName()+"_op");
-                int totalColumns = 18;
+                int totalColumns = 10;
+                int totalRows = 1000000;
+                int rowInterval=100000;
                 Random rand = new Random();
                 // Code to create excel file
 
@@ -43,31 +67,20 @@ public class PartialDriver {
                 cellA1.setCellValue(0);
 
                 CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize);
-
-                for (int colToQuery = 0; colToQuery < totalColumns; colToQuery++) {
-                    xcol = 0;
-                    System.out.println("GC initiated");
-                    System.gc();
-                    System.out.println("GC completed");
-                    row1 = worksheet.createRow(xrow++);
-                    cellA1 = row1.createCell(xcol++);
-                    cellA1.setCellValue("Col " + (colToQuery + 1));
-                    long k = rand.nextLong() % 56;
-                    long time[] = new long[1];
-                    sportyDS.rangeScan(colToQuery, k, k + 100, time);
-                    cellA1 = row1.createCell(xcol++);
-                    cellA1.setCellValue(time[0]);
+                long time1=System.nanoTime(),time2;
+                for (int row = rowInterval; row <=totalRows; row=row+rowInterval) {
+                    sportyDS.lookUp(5,row);
+                        xcol = 0;
+                        row1 = worksheet.createRow(xrow++);
+                        cellA1 = row1.createCell(xcol++);
+                        cellA1.setCellValue("Row " + (row));
+                        time2 = System.nanoTime();
+                        cellA1 = row1.createCell(xcol++);
+                        cellA1.setCellValue((time2-time1)/1000000);
+                        time1=time2;
                 }
-
-                /*long wholeParseStart = System.nanoTime();
-                CSVTable initLoad = new CSVTable(pathname);
-                long wholeParseEnd = System.nanoTime();
-                cellA1 = row1.createCell(xcol++);
-                cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);
-                */
                 workbook.write(fileOut);
                 fileOut.flush();
-                Thread.sleep(3000);
             }
         } catch (Exception e) {
             e.printStackTrace();
