@@ -11,10 +11,11 @@ public class CSVDriver {
         String destPath = args[1];
         FileOutputStream fileOut = null;
         int blockSize = 512*1024;
+        int parserType = 0;                             // 0 -> infile , 1 -> inMem
         File inputFiles[] = sourceDir.listFiles();
         try {
             for(File file:inputFiles) {
-                fileOut = new FileOutputStream(destPath+file.getName()+"_op");
+                fileOut = new FileOutputStream(destPath+file.getName());
                 int totalColumns = 18;
                 Random rand = new Random();
                 // Code to create excel file
@@ -36,7 +37,7 @@ public class CSVDriver {
                 cellA1 = row1.createCell(xcol++);
                 cellA1.setCellValue(0);
 
-                CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize);
+                CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, parserType );
 
                 for (int colToQuery = 0; colToQuery < totalColumns; colToQuery++) {
                     xcol = 0;
