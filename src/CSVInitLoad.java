@@ -31,6 +31,7 @@ class DefaultParserIterator extends KeyValueIterator {
     }
     public boolean next(){
         if(iterator.hasNext()){
+            System.out.println(columnNo);
             value = Long.parseLong(iterator.next().get(columnNo));
             key++;
             return true;

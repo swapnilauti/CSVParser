@@ -12,9 +12,19 @@ import java.util.Random;
  * This program records observations for InMem Parser
  */
 public class Driver2 {
+    private static int[] stringToIntArray(String s){
+        String sarr[] = s.split(",");
+        int ret[] = new int[sarr.length];
+        int i=0;
+        for(String colNo:sarr){
+            ret[i++]=Integer.parseInt(colNo);
+        }
+        return ret;
+    }
     public static void main(String args[]){
         File sourceDir = new File(args[0]);
         String destPath = args[1];
+        int dateColumns[] = stringToIntArray(args[2]);
         FileOutputStream fileOut = null;
         int blockSize = 0;
         int parserType = 1;                             // 0 -> infile , 1 -> inMem
@@ -39,7 +49,7 @@ public class Driver2 {
                 }
                 xcol = 0;
                 for (int iterationCount = 0; iterationCount < 10; iterationCount++) {
-                    CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, parserType);
+                    CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, dateColumns, parserType);
                     xrow = 0;
                     xcol++;
                     row1 = worksheet.getRow(xrow++);

@@ -35,18 +35,30 @@ public class PartialDriver {
         //Print Maximum available memory
         System.out.println("Max Memory:" + runtime.maxMemory() / mb);
     }
+    private static int[] stringToIntArray(String s){
+        String sarr[] = s.split(",");
+        int ret[] = new int[sarr.length];
+        int i=0;
+        for(String colNo:sarr){
+            ret[i++]=Integer.parseInt(colNo);
+        }
+        return ret;
+    }
+
     public static void main(String args[]){
         File sourceDir = new File(args[0]);
         String destPath = args[1];
+        int dateColumns[] = stringToIntArray(args[2]);
         FileOutputStream fileOut = null;
         int blockSize = 512*1024;
+        int parserType = 0;
         File inputFiles[] = sourceDir.listFiles();
         try {
             for(File file:inputFiles) {
-                fileOut = new FileOutputStream(destPath+file.getName()+"_op");
-                int totalColumns = 10;
-                int totalRows = 1000000;
-                int rowInterval=100000;
+                fileOut = new FileOutputStream(destPath+file.getName());
+                int totalColumns = 18;
+                int totalRows = 99;
+                int rowInterval=10;
                 Random rand = new Random();
                 // Code to create excel file
 
@@ -67,7 +79,7 @@ public class PartialDriver {
                 cellA1 = row1.createCell(xcol++);
                 cellA1.setCellValue(0);
 
-                CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize,0);
+                CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, dateColumns, parserType);
                 long time1=System.nanoTime(),time2;
                 for (int row = rowInterval; row <=totalRows; row=row+rowInterval) {
                     sportyDS.lookUp(5,row);

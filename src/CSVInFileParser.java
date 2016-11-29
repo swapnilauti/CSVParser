@@ -1,5 +1,9 @@
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Logger;
 
 
@@ -15,13 +19,17 @@ public class CSVInFileParser implements CSVParser{
     private int lastRowPositionalMap;
     private ArrayList<ArrayList<Long>> positionalMap;
     private int columnSize;
+    private int[] dateColumns;
+    private DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
+
 
     /**Constructor
      * @param blockSize blocksize for the file read
      * @param fileName filename with path
      */
-    public CSVInFileParser(String fileName, int blockSize) {
+    public CSVInFileParser(String fileName, int blockSize, int[] dateColumns) {
         this.fileName = fileName;
+        this.dateColumns = dateColumns;
         positionalMap = new ArrayList<>();
         fileReader = new CSVReader(fileName);
         this.blockSize = blockSize;
@@ -36,6 +44,13 @@ public class CSVInFileParser implements CSVParser{
         return columnSize;
     }
 
+    private boolean isDateColumn(int colNo){
+        for(int i:dateColumns){
+            if(colNo==i)
+                return true;
+        }
+        return false;
+    }
 
     /**This method fetches the column by creating positional map if it
      * doesn't exist. if the positional map exists then it fetches the column
@@ -46,14 +61,68 @@ public class CSVInFileParser implements CSVParser{
      */
     public ArrayList<Long> fetchColumn(int column) {
         if (positionalMapStatus==PositionalMapStatus.NONE) {
-            return (createPositionalMapFetchCol(column));
+            if(isDateColumn(column)) {
+                return (createPositionalMapFetchDateCol(column));
+            }
+            else{
+                return (createPositionalMapFetchLongCol(column));
+            }
         }
         if(positionalMapStatus==PositionalMapStatus.PARTIAL){
             //TODO
         }
         //case when positionalMapStatus==PositionalMapStatus.COMPLETE
-        return fetchColFromPositionalMap(column);
+        if(isDateColumn(column)){
+            return fetchDateColFromPositionalMap(column);
+        }
+        else{
+            return fetchLongColFromPositionalMap(column);
+        }
+
     }
+
+    private ArrayList<Long> createPositionalMapFetchDateCol(int column) {
+
+        int colCount=0,bytesRead;
+        long position=0;
+        byte[] block=new byte[blockSize];
+        ArrayList<Long> returnList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        while((bytesRead=fileReader.readCSVBlock(block)) > 0){
+            ArrayList<Long> row = new ArrayList<>();
+            byte newLine = (byte)10,comma = (byte)44;
+            for(int i=0;i<bytesRead;++i){
+                if(block[i]==comma){
+                    row.add(position-1);
+                    colCount++;
+                }
+                else if(block[i]==newLine){
+                    row.add(position-1);
+                    Date date = null;
+                    try {
+                        date = df.parse(sb.toString());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    sb = new StringBuilder();
+                    returnList.add(date.getTime());
+                    colCount=0;
+                    positionalMap.add(row);
+                    row = new ArrayList<>();
+
+                }
+                else if(colCount==column){
+                    sb.append((char)block[i]);
+                }
+                position++;
+            }
+        }
+        columnSize=positionalMap.get(0).size();
+        fileReader.resetFilePos();
+        positionalMapStatus=PositionalMapStatus.COMPLETE;
+        return returnList;
+    }
+
 
     /**
      * This is private method is used for creating full positional map and simultaneously
@@ -62,16 +131,16 @@ public class CSVInFileParser implements CSVParser{
      * @param column int index of the column of the CSV table
      * @return arrayList of column value
      */
-    private ArrayList<Long> createPositionalMapFetchCol(int column) {
+    private ArrayList<Long> createPositionalMapFetchLongCol(int column) {
 
         int colCount=0,bytesRead;
         long position=0;
         byte[] block=new byte[blockSize];
         ArrayList<Long> returnList = new ArrayList<>();
         ArrayList<Byte> cell = new ArrayList<>();
+        byte newLine = (byte)10,comma = (byte)44;
         while((bytesRead=fileReader.readCSVBlock(block)) > 0){
             ArrayList<Long> row = new ArrayList<>();
-            byte newLine = (byte)10,comma = (byte)44;
             for(int i=0;i<bytesRead;++i){
                 if(block[i]==comma){
                     row.add(position-1);
@@ -97,13 +166,53 @@ public class CSVInFileParser implements CSVParser{
         return returnList;
     }
 
+    private ArrayList<Long> fetchDateColFromPositionalMap(int column) {
+
+        ArrayList<Long> returnList = new ArrayList<>();
+        int bytesRead=0;
+        long bytesTillLastBlock=0;
+        byte[] block=new byte[blockSize];
+        StringBuilder sb = new StringBuilder();
+        for(int i=0;i<positionalMap.size();++i){
+            long startPos=0;
+            long endPos=0;
+            if(column==0){
+                startPos=(i==0?0:positionalMap.get(i - 1).get(getColumnSize() - 1) + 2);
+                endPos = positionalMap.get(i).get(column);
+            }
+            else {
+                startPos = positionalMap.get(i).get(column - 1) + 2;
+                endPos = positionalMap.get(i).get(column);
+            }
+            if(startPos>=bytesTillLastBlock+(long)bytesRead){
+                bytesTillLastBlock+=bytesRead;
+                bytesRead=fileReader.readCSVBlock(block);
+            }
+
+            for(int j=(int)(startPos-bytesTillLastBlock);j<=(int)(endPos-bytesTillLastBlock);++j){
+                sb.append((char)block[j]);
+            }
+            Date date = null;
+            try {
+                date = df.parse(sb.toString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            sb = new StringBuilder();
+            returnList.add(date.getTime());
+        }
+        fileReader.resetFilePos();
+        return returnList;
+    }
+
+
     /**
      * This is private method is used for fetching the column completely from the position map
      *
      * @param column int index of the column of the CSV table
      * @return arrayList of column value
      */
-    private ArrayList<Long> fetchColFromPositionalMap(int column) {
+    private ArrayList<Long> fetchLongColFromPositionalMap(int column) {
 
         ArrayList<Long> returnList = new ArrayList<>();
         int bytesRead=0;
@@ -198,6 +307,7 @@ public class CSVInFileParser implements CSVParser{
         boolean valFound=false;
         byte[] block=new byte[blockSize];
         ArrayList<Byte> cell = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
         while((bytesRead=fileReader.readCSVBlock(block)) > 0){
             ArrayList<Long> row = new ArrayList<>();
             for(int i=0;i<bytesRead;++i){
@@ -213,7 +323,12 @@ public class CSVInFileParser implements CSVParser{
                     rowCount++;
                 }
                 else if(rowCount==rowId && colCount==column){
-                    cell.add(block[i]);
+                    if(isDateColumn(column)){
+                        sb.append((char)block[i]);
+                    }
+                    else {
+                        cell.add(block[i]);
+                    }
                     valFound=true;
                 }
                 position++;
@@ -228,7 +343,18 @@ public class CSVInFileParser implements CSVParser{
         }
         columnSize=positionalMap.get(0).size();
         fileReader.resetFilePos();
-        return (CSVUtil.byteArrayToLong(cell));
+        if(isDateColumn(column)){
+            Date date = null;
+            try {
+                date = df.parse(sb.toString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return (date.getTime());
+        }
+        else{
+            return (CSVUtil.byteArrayToLong(cell));
+        }
     }
 
 }

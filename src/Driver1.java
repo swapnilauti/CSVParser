@@ -27,7 +27,7 @@ public class Driver1 {
         int dateColumns[] = stringToIntArray(args[2]);
         FileOutputStream fileOut = null;
         int blockSize = 0;
-        int sizeFactor[] = new int[]{16,32,64,128,256,512,1024,32*1024,64*1024};
+        int sizeFactor[] = new int[]{64*1024};
         //{1,256,512,768,1024, 16*1024, 32*1024, 96*1024};
         int parserType = 0;                             // 0 -> infile , 1 -> inMem
         File inputFiles[] = sourceDir.listFiles();

@@ -35,13 +35,13 @@ public class CSVTable {
     private Driver cogDrivers[];
     private boolean hasCog[];
     private CSVParser csvParser;
-
-    public CSVTable(String filePath, int blockSize, int parserType){                            // Constructor for InMem or InFile parser
+    //hashset of date columns
+    public CSVTable(String filePath, int blockSize, int dateColumns[], int parserType){                            // Constructor for InMem or InFile parser
         if(parserType == 0) {
-            csvParser = new CSVInFileParser(filePath, blockSize);
+            csvParser = new CSVInFileParser(filePath, blockSize, dateColumns);
         }
         else{
-            csvParser = new CSVInMemParser(filePath);
+            csvParser = new CSVInMemParser(filePath, dateColumns);
         }
 
         System.out.println("Parser = "+csvParser.getClass().toString()+" block size(in KB) = "+(blockSize/1024));
@@ -92,10 +92,12 @@ public class CSVTable {
             cogDrivers = new Driver[totalCols];
             hasCog = new boolean[totalCols];
         }
+        // Jitd integration starts
         FileValueIterator fvi = new FileValueIterator(columnValues);
         ArrayCog root = new ArrayCog(columnValues.size());
         root.load(fvi);
         cogDrivers[colNo] = new Driver(new MergeMode(),root);
+        // Jitd integration ends
         hasCog[colNo] = true;
     }
 
