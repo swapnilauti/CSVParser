@@ -12,22 +12,33 @@ import java.util.Random;
  * This Driver is for InFile Parser with varying block Sizes
  */
 public class Driver1 {
+    private static int[] stringToIntArray(String s){
+        String sarr[] = s.split(",");
+        int ret[] = new int[sarr.length];
+        int i=0;
+        for(String colNo:sarr){
+            ret[i++]=Integer.parseInt(colNo);
+        }
+        return ret;
+    }
     public static void main(String args[]){
         File sourceDir = new File(args[0]);
         String destPath = args[1];
+        int dateColumns[] = stringToIntArray(args[2]);
         FileOutputStream fileOut = null;
         int blockSize = 0;
-        int sizeFactor[] = new int[]{1,256,512,768,1024,32*1024, 64*1024, 96*1024};
+        int sizeFactor[] = new int[]{16,32,64,128,256,512,1024,32*1024,64*1024};
+        //{1,256,512,768,1024, 16*1024, 32*1024, 96*1024};
         int parserType = 0;                             // 0 -> infile , 1 -> inMem
         File inputFiles[] = sourceDir.listFiles();
+        HSSFWorkbook workbook = new HSSFWorkbook();
         try {
             for (File file : inputFiles) {
-                fileOut = new FileOutputStream(destPath + file.getName());
+                fileOut = new FileOutputStream(destPath +file.getName());
                 int totalColumns = 18;
                 Random rand = new Random();
                 // Code to create excel file
 
-                HSSFWorkbook workbook = new HSSFWorkbook();
                 for(int sizeCount = 0; sizeCount<sizeFactor.length;sizeCount++) {
                     int xrow = 0, xcol = 0;
                     blockSize = sizeFactor[sizeCount]*1024;
@@ -42,7 +53,7 @@ public class Driver1 {
                     }
                     xcol = 0;
                     for (int iterationCount = 0; iterationCount < 10; iterationCount++) {
-                        CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, parserType);
+                        CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, dateColumns, parserType);
                         xrow = 0;
                         xcol++;
                         row1 = worksheet.getRow(xrow++);
@@ -67,14 +78,15 @@ public class Driver1 {
                         Thread.sleep(3000);
                     }
                 }
-                workbook.write(fileOut);
-                fileOut.flush();
+
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }  finally {
             try {
+                workbook.write(fileOut);
+                fileOut.flush();
                 fileOut.close();
             } catch (IOException e) {
                 e.printStackTrace();
