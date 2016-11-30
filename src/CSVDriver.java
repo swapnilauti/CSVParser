@@ -66,7 +66,7 @@ public class CSVDriver {
                 }*/
 
                     long wholeParseStart = System.nanoTime();
-                    CSVInitLoad initLoad = new CSVInitLoad(file.getAbsolutePath());
+                    CSVTable initLoad = new CSVTable(file.getAbsolutePath());
                     long wholeParseEnd = System.nanoTime();
                     cellA1 = row1.createCell(xcol++);
                     cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);

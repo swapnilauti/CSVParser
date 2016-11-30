@@ -65,6 +65,7 @@ public class CSVTable {
                 cell.clear();
                 } else if(block[i]==comma){
                 columns[colNo++].add(CSVUtil.byteArrayToLong(cell));
+                long l = CSVUtil.byteArrayToLong(cell);
                 cell.clear();
                 } else{
                 cell.add(block[i]);
