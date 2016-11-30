@@ -26,13 +26,13 @@ public class Driver2 {
         String destPath = args[1];
         int dateColumns[] = stringToIntArray(args[2]);
         FileOutputStream fileOut = null;
-        int blockSize = 0;
+        int blockSize = 512;
         int parserType = 1;                             // 0 -> infile , 1 -> inMem
         File inputFiles[] = sourceDir.listFiles();
         try {
             for (File file : inputFiles) {
                 fileOut = new FileOutputStream(destPath + file.getName());
-                int totalColumns = 18;
+                int totalColumns = 10;
                 Random rand = new Random();
                 // Code to create excel file
 
@@ -48,7 +48,7 @@ public class Driver2 {
                     cellA1.setCellValue("Col " + (colToQuery + 1));
                 }
                 xcol = 0;
-                for (int iterationCount = 0; iterationCount < 10; iterationCount++) {
+                for (int iterationCount = 0; iterationCount < 12; iterationCount++) {
                     CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, dateColumns, parserType);
                     xrow = 0;
                     xcol++;

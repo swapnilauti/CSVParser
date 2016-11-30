@@ -41,9 +41,13 @@ public class CSVDriver {
                 cellA1.setCellValue("Iteration "+(i+1));
                 for (File file : inputFiles) {
                     row1=worksheet.getRow(xrow++);
+                    System.out.println("PRINT STATS before PARSING FILE "+file.getName());
+                    PartialDriver.printStats();
                     long wholeParseStart = System.nanoTime();
                     CSVTable initLoad = new CSVTable(file.getAbsolutePath());
                     long wholeParseEnd = System.nanoTime();
+                    System.out.println("PRINT STATS after PARSING FILE "+file.getName());
+                    PartialDriver.printStats();
                     cellA1 = row1.createCell(xcol);
                     cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);
                     Thread.sleep(3000);

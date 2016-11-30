@@ -60,24 +60,26 @@ public class Driver3 {
                 cellA1.setCellValue(file.getName());
             }
 
-            for (int iterationCount = 0; iterationCount < 12; iterationCount++) {
+            for (int iterationCount = 0; iterationCount < 6; iterationCount++) {
                 xrow = 0;
                 xcol++;
                 row1 = worksheet.getRow(xrow++);
                 cellA1 = row1.createCell(xcol);
                 cellA1.setCellValue("Iteration " + (iterationCount + 1));
                 try {
-                    Thread.sleep(3000);
                     for (File file : inputFiles) {
                         System.out.println(file.getName());
                         CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, dateColumns, parserType);
                         long totalTime = 0l;
                         for (int colToQuery = 0; colToQuery < totalColumns; colToQuery++) {
                             System.gc();
+                            Thread.sleep(3000);
                             long k = rand.nextLong() % 56;
+                            System.out.println("**************************READINGS STARTED for column "+(colToQuery+1)+"********************************");
                             long time[] = new long[1];
                             sportyDS.rangeScan(colToQuery, k, k + 100, time);
                             totalTime += time[0];
+                            System.out.println("**************************READING COMPLETED*******************************");
                         }
                         row1 = worksheet.getRow(xrow++);
                         cellA1 = row1.createCell(xcol);
@@ -89,7 +91,7 @@ public class Driver3 {
             }
         }
         try {
-            fileOut = new FileOutputStream(destPath + "TotalReadTimeVsFileSize.csv");
+            fileOut = new FileOutputStream(destPath +"TotalReadTimeVsFileSize.csv");
             workbook.write(fileOut);
             fileOut.flush();
             fileOut.close();
