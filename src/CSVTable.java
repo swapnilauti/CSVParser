@@ -43,8 +43,6 @@ public class CSVTable {
         else{
             csvParser = new CSVInMemParser(filePath, dateColumns);
         }
-
-        System.out.println("Parser = "+csvParser.getClass().toString()+" block size(in KB) = "+(blockSize/1024));
     }
 
     public CSVTable(String filePath){                                           //Constructor for Naive Parser
@@ -65,7 +63,6 @@ public class CSVTable {
                 cell.clear();
                 } else if(block[i]==comma){
                 columns[colNo++].add(CSVUtil.byteArrayToLong(cell));
-                long l = CSVUtil.byteArrayToLong(cell);
                 cell.clear();
                 } else{
                 cell.add(block[i]);
