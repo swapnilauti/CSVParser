@@ -2,6 +2,7 @@
   <library name="poi-3.15">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/poi-3.15.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/log4j-core-2.7.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

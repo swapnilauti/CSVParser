@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Logger;
 
-
+/*
+    Class for InFile Parser
+ */
 public class CSVInFileParser implements CSVParser{
     private static String fileName;
     private static Logger log = Logger.getLogger("CSVReader");
@@ -81,6 +83,11 @@ public class CSVInFileParser implements CSVParser{
 
     }
 
+    /**
+     * If no positional map is created, this function creates a positional map and returns values for first column
+     * * @param column int index of the column of the CSV table
+     * @return arrayList of column value
+     */
     private ArrayList<Long> createPositionalMapFetchDateCol(int column) {
 
         int colCount=0,bytesRead;

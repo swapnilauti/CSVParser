@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * Created by SwapnilSudam on 11/1/2016.
+ * Interface for Parsers
  */
 public interface CSVParser {
     public int getColumnSize();
