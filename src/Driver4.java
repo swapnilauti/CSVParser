@@ -3,11 +3,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Random;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.*;
 
-
-public class CSVDriver {
+/**
+ * This program records observation for Navie Parser
+ */
+public class Driver4 {
+    private static final Logger logger = LogManager.getLogger(Driver4.class.getName());
     public static void main(String args[]){
         File sourceDir = new File(args[0]);
         String destPath = args[1];
@@ -33,7 +37,7 @@ public class CSVDriver {
         }
         try {
             fileOut = new FileOutputStream(destPath + "NaiveParserObservations");
-            for(int i=0;i<12;i++) {
+            for(int i=0;i<1;i++) {
                 xcol++;
                 xrow = 0;
                 row1=worksheet.getRow(xrow++);
@@ -41,27 +45,26 @@ public class CSVDriver {
                 cellA1.setCellValue("Iteration "+(i+1));
                 for (File file : inputFiles) {
                     row1=worksheet.getRow(xrow++);
-                    System.out.println("PRINT STATS before PARSING FILE "+file.getName());
-                    PartialDriver.printStats();
+                    System.gc();
+                    Thread.sleep(3000);
+                    logger.info("READING STARTED for file {}",file.getName());
                     long wholeParseStart = System.nanoTime();
                     CSVTable initLoad = new CSVTable(file.getAbsolutePath());
                     long wholeParseEnd = System.nanoTime();
-                    System.out.println("PRINT STATS after PARSING FILE "+file.getName());
-                    PartialDriver.printStats();
+                    logger.info("READING COMPLETED for file {}",file.getName());
                     cellA1 = row1.createCell(xcol);
                     cellA1.setCellValue((wholeParseEnd - wholeParseStart) / 1000);
-                    Thread.sleep(3000);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }  finally {
             try {
                 workbook.write(fileOut);
                 fileOut.flush();
                 fileOut.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
     }

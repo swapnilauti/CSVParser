@@ -35,8 +35,11 @@ public class CSVTable {
     private Driver cogDrivers[];
     private boolean hasCog[];
     private CSVParser csvParser;
-    //hashset of date columns
-    public CSVTable(String filePath, int blockSize, int dateColumns[], int parserType){                            // Constructor for InMem or InFile parser
+
+    /*
+     Constructor for InMem or InFile parser
+    */
+    public CSVTable(String filePath, int blockSize, int dateColumns[], int parserType){
         if(parserType == 0) {
             csvParser = new CSVInFileParser(filePath, blockSize, dateColumns);
         }
@@ -44,8 +47,10 @@ public class CSVTable {
             csvParser = new CSVInMemParser(filePath, dateColumns);
         }
     }
-
-    public CSVTable(String filePath){                                           //Constructor for Naive Parser
+    /*
+     Constructor for Naive parser
+    */
+    public CSVTable(String filePath){
         CSVReader csvReader = new CSVReader(filePath);
         byte block[] = csvReader.readCSVAllLines();
         int totalCol = calculateTotalCol(block);
@@ -70,7 +75,9 @@ public class CSVTable {
         }
     }
 
-
+    /*
+    * Returns total number of columns in the CSV file
+    * */
     private int calculateTotalCol(byte block[]){
         int totalCol=0;
         for(int i=0;block[i]!=10;i++){
@@ -81,6 +88,10 @@ public class CSVTable {
         return totalCol+1;
     }
 
+    /*
+        Cogs are data structures which exhibit dynamic indexing of records
+        This function creates Cog for a given column number
+     */
     private void createCog(int colNo, long time[]){
         time[0]=System.nanoTime();
         ArrayList<Long> columnValues = csvParser.fetchColumn(colNo);
@@ -99,18 +110,25 @@ public class CSVTable {
         hasCog[colNo] = true;
     }
 
+    /*
+        Function to perform rangeScan query over a particular column number
+     */
     public KeyValueIterator rangeScan(int colNo, long low, long high, long time[]){
         if(cogDrivers==null || !hasCog[colNo])
             createCog(colNo,time);
-        /*Driver driver = cogDrivers[colNo];
-        KeyValueIterator iter = driver.scan(low,high);
-        return iter;*/
         return null;
     }
 
+    /*
+        Function to perform lookup query for a specified value in the column
+     */
     public long lookUp(int col, int row){
         return csvParser.fetchValue(col,row);
     }
+
+    /*
+        Function to perform lookup query for a given column number and specified range of row numbers
+     */
     public ArrayList<Long> lookUp(int col, int rowl, int rowh){
         if(rowl>rowh){
             int temp = rowl;
