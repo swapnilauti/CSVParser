@@ -15,24 +15,13 @@ import java.util.Random;
 public class PartialDriver {
     public static void printStats(){
         int mb = 1024*1024;
-
-        //Getting the runtime reference from system
         Runtime runtime = Runtime.getRuntime();
-
         System.out.println("##### Heap utilization statistics [MB] #####");
-
-        //Print used memory
         System.out.println("Used Memory:"
                 + (runtime.totalMemory() - runtime.freeMemory()) / mb);
-
-        //Print free memory
         System.out.println("Free Memory:"
                 + runtime.freeMemory() / mb);
-
-        //Print total available memory
         System.out.println("Total Memory:" + runtime.totalMemory() / mb);
-
-        //Print Maximum available memory
         System.out.println("Max Memory:" + runtime.maxMemory() / mb);
     }
     private static int[] stringToIntArray(String s){
@@ -50,55 +39,57 @@ public class PartialDriver {
         String destPath = args[1];
         int dateColumns[] = stringToIntArray(args[2]);
         FileOutputStream fileOut = null;
-        int blockSize = 512*1024;
         int parserType = 0;
+        int blockSize=512*1024;
         File inputFiles[] = sourceDir.listFiles();
+        HSSFWorkbook workbook = new HSSFWorkbook();
         try {
-            for(File file:inputFiles) {
-                fileOut = new FileOutputStream(destPath+file.getName());
-                int totalColumns = 18;
-                int totalRows = 99;
-                int rowInterval=10;
+            for (File file : inputFiles) {
+                fileOut = new FileOutputStream(destPath +file.getName());
+                int totalRows = 1840000;
+                int incrementRow=184000;
                 Random rand = new Random();
                 // Code to create excel file
 
                 int xrow = 0, xcol = 0;
-                HSSFWorkbook workbook = new HSSFWorkbook();
-                HSSFSheet worksheet = workbook.createSheet("naive vs sporty");
+                HSSFSheet worksheet = workbook.createSheet("Column Read");
                 HSSFRow row1 = worksheet.createRow(xrow++);
                 HSSFCell cellA1 = row1.createCell(xcol++);
-                cellA1.setCellValue("time in microseconds");
-                cellA1 = row1.createCell(xcol++);
-                cellA1.setCellValue("SportyDS Parser");
-                cellA1 = row1.createCell(xcol++);
-                cellA1.setCellValue("Naive Parser");
+                cellA1.setCellValue("InFile");
+                for(int rowToQuery = incrementRow;rowToQuery<=totalRows;rowToQuery=rowToQuery+incrementRow){
+                    row1 = worksheet.createRow(xrow++);
+                    cellA1 = row1.createCell(0);
+                    cellA1.setCellValue("Rows " + (rowToQuery));
+                }
                 xcol = 0;
-                row1 = worksheet.createRow(xrow++);
-                cellA1 = row1.createCell(xcol++);
-                cellA1.setCellValue("initial load and convert");
-                cellA1 = row1.createCell(xcol++);
-                cellA1.setCellValue(0);
-
-                CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, dateColumns, parserType);
-                long time1=System.nanoTime(),time2;
-                for (int row = rowInterval; row <=totalRows; row=row+rowInterval) {
-                    sportyDS.lookUp(5,row);
-                        xcol = 0;
-                        row1 = worksheet.createRow(xrow++);
-                        cellA1 = row1.createCell(xcol++);
-                        cellA1.setCellValue("Row " + (row));
+                for (int iterationCount = 0; iterationCount < 12; iterationCount++) {
+                    CSVTable sportyDS = new CSVTable(file.getAbsolutePath(), blockSize, dateColumns, parserType);
+                    xrow = 0;
+                    xcol++;
+                    row1 = worksheet.getRow(xrow++);
+                    cellA1 = row1.createCell(xcol);
+                    cellA1.setCellValue("Iteration "+(iterationCount+1));
+                    long time1=System.nanoTime(),time2;
+                    for (int rowToQuery = incrementRow;rowToQuery<=totalRows;rowToQuery=rowToQuery+incrementRow) {
+                        System.out.println("**************Reading Started***************");
+                        row1 = worksheet.getRow(xrow++);
+                        sportyDS.lookUp(5,rowToQuery);
                         time2 = System.nanoTime();
-                        cellA1 = row1.createCell(xcol++);
+                        cellA1 = row1.createCell(xcol);
                         cellA1.setCellValue((time2-time1)/1000000);
                         time1=time2;
+                        System.out.println("##################Reading Ended######################");
+                    }
+                    System.gc();
+                    Thread.sleep(6000);
                 }
-                workbook.write(fileOut);
-                fileOut.flush();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }  finally {
             try {
+                workbook.write(fileOut);
+                fileOut.flush();
                 fileOut.close();
             } catch (IOException e) {
                 e.printStackTrace();
